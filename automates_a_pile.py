@@ -75,13 +75,27 @@ def next_configs(a,c,w):
     # c : configuration (etat,pile)
     # w : mot represente par une liste
     # A COMPLETER
-    return
+    (st,alph,stack_alph,t_rel,init_st,init_stack,accept_mode,final_st,eq_st) = a
+    (conf_st,conf_stack) = c
+    configs = []
+    if conf_stack:
+        conf_stack_top = conf_stack.pop(0)
+        configs += [((nconf_st,nconf_stack_top+conf_stack),w) for (nconf_st,nconf_stack_top) in find_trans(conf_st,eq_st,t_rel,conf_stack_top,None)]
+        if w:
+            configs += [((nconf_st,nconf_stack_top+conf_stack),w[1:]) for (nconf_st,nconf_stack_top) in find_trans(conf_st,eq_st,t_rel,conf_stack_top,w[0])]
+    return configs
 
 def is_in_LA(a,w):
     # a : automate a pile
     # w : mot represente par une liste
     # A COMPLETER
-    return
+    (st,alph,stack_alph,t_rel,init_st,init_stack,accept_mode,final_st,eq_st) = a
+    execs = [((init_st, [init_stack]), w)]
+    for ((ex_st, ex_stack), ex_w) in execs:
+            if not ex_w and ((accept_mode and is_in(eq_st,ex_st,final_st)) or not (accept_mode or ex_stack)):
+                return True
+            execs.extend(next_configs(a,(ex_st,ex_stack),ex_w))
+    return False
 
 
 
